@@ -1,0 +1,99 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8" class="next-head"/><title class="next-head">Cultlang</title><meta name="viewport" content="initial-scale=1.0, width=device-width" class="next-head"/><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" class="next-head"/><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous" class="next-head"/><link rel="preload" href="/_next/static/fsgObTKcU2rpqk99skQBs/pages/blog.js" as="script"/><link rel="preload" href="/_next/static/fsgObTKcU2rpqk99skQBs/pages/_app.js" as="script"/><link rel="preload" href="/_next/static/fsgObTKcU2rpqk99skQBs/pages/_error.js" as="script"/><link rel="preload" href="/_next/static/runtime/webpack-42652fa8b82c329c0559.js" as="script"/><link rel="preload" href="/_next/static/chunks/commons.80cc66e89e6bbcfeda27.js" as="script"/><link rel="preload" href="/_next/static/runtime/main-f33dabec269186cf64d0.js" as="script"/></head><body><div id="__next"><div class="container" data-reactroot=""><nav class="navbar"><ul class="nav nav-pills"><a href="/" class="navbar-brand">Cultlang</a><li class="nav-item"><a href="/blog" class="nav-link">Blog</a></li></ul><ul class="nav"><li class="nav-item"><a href="https://cultlang.slack.com/" class="nav-link"><i class="fab fa-slack"></i></a></li><li class="nav-item"><a href="https://github.com/cultlang/cultlang" class="nav-link"><i class="fab fa-github"></i></a></li></ul></nav><div><div style="margin-bottom:2em;border:1px solid #d8d8d8" class="media"><div class="media-body"><h4 class="media-heading">2018-12-02T20:08:55.025Z</h4><div class="content"><h1>Advent of Code 2018 - Day 1, First Star</h1>
+<p>The <a href="https://adventofcode.com/2018/day/1">first day's</a> first star is pretty simple, it can be effectively written as a one liner and we will be dissecting the solution for the rest of this article. As a brief written description:</p>
+<ul>
+<li>Open the input file (in text mode).</li>
+<li>Split the contents of the file on newlines into a sequence of strings.
+<ul>
+<li>This is possible because text files are inherently iterable as a stream of characters.</li>
+</ul></li>
+<li>Map an integer parse function over that sequence of strings, resulting in a sequence of integers.
+<ul>
+<li>This is probably the most complicated expression call because it will usually take a lambda.</li>
+</ul></li>
+<li>Sum the sequence of integers.</li>
+<li>Print the results.</li>
+</ul>
+<h2>Expressions and Method Chaining</h2>
+<p>A common pattern in programming is chaining methods, effectively passing the result of an expression as an argument to another expression. Where each expression does some small transformation for the next expression. This challenge is an excellent example for demonstrating this idea. Let's first consider how this might be represented classically (and perhaps naively):</p>
+<pre><code>;;;; In a lisp style:
+(print (sum (map (split (open &quot;input&quot; :text) &quot;\n&quot;) fn:(parse Int64 arg:0))))
+
+;;;; In a non-object oriented style (python-esque)
+print(sum(map(split(open(&quot;input&quot;, text=True), '\n'), s =&gt; parse(Int64, s))))
+</code></pre>
+<p>This could be rewritten as a sequence of statements (rather than a single large statement expression). This is often easier to read, and offers us an opportunity to name (and type; and even comment more easily on) the variables of each step.</p>
+<pre><code>;;;; In a strictly imperative method (javascript-esque)
+{
+    ; We are also using semicolons here to also mean end of statement, as is common in C descendant languages
+    var file = open(&quot;input&quot;, :text);
+    var lines = split(file, '\n');
+    ; Also note that we referenced the parse function off an object here.
+    var numbers = map(lines, s =&gt; Int64.parse(s));
+    var result = sum(numbers);
+    
+    print(sum);
+}
+
+;;;; In a lisp style using let we can achieve something similar
+(let
+  ((file (open &quot;input&quot; :text))
+   (lines (split file '\n'))
+   (numbers (map lines fn:(parse Int64 arg:0)))
+   (result (sum numbers)))
+  (print result))
+</code></pre>
+<p>However this may be <em>too</em> tedious and verbose. Especially due to having to repeat the variable name twice, which while useful for knowing what is happening, is perhaps a bit too much. We would prefer something in the middle of these two extremes.</p>
+<h3>Aside: Same Number of Parenthesis</h3>
+<p>A common complaint of lisp like languages are that there are too many parenthesis. However I will argue that there are usually the Same Number Of Parenthesis (SNOP) regardless of the syntax used (the acronym reminds me of both scoff and snob, as a way to describe how I often reply to such complaints). Parenthesis relate back to the (ideally) context-free parsers used to read the syntaxes of most programming languages, and hence they can't really be avoided in a deterministic programming language of any real expressive capability.</p>
+<p>For example the two expression examples have an exactly equal number of parenthesis. The statement example requires some squinting, but if you consider each <code>=;</code> as being an implicit sort of parenthesis (and of course the <code>{}</code> mapping to <code>()</code>) you'll find only one extra parenthesis around the binding section of the <code>let</code>. This is an artifact of the classic let syntax and is why Cult avoids using the classic <code>let</code> syntax, opting instead for a more general block semantic (<code>do</code>) - that allows local variables - similar to most imperative style languages.</p>
+<p>In general I leave it up to the reader to find the mapping, though I will try to note interesting cases like the <code>let</code> syntax here.</p>
+<h3>Extension Methods Provide a Solution</h3>
+<p>If we look at object oriented languages we see they allow for a style of chaining methods on objects, effectively using the method dispatch syntax to better arrange the expressions. This technique allows the best of both worlds in some ways, an easier way to read what is happening while not introducing a bunch of extra variables.</p>
+<pre><code>; In an object oriented (OO) style (C#-esque)
+open(&quot;input&quot;, text: true)
+    .split('\n')
+    .map(Int64.parse)
+    .sum()
+    ; Print would likely not be a chained method in an OO language
+    .print();
+</code></pre>
+<p>This is much more readable while still being concise, it's perhaps the most ideal way to write express this concept. It's often used to build so called &quot;Fluent Interfaces&quot; in part because it allows the programmer to chain the next expression very quickly (even if they are unfamiliar with the interface) through the use of auto-complete features.</p>
+<p>However there is a problem with style, functions are no longer free: due to the use of the method dispatch mechanisms they must be tied to the object they are to be called on. This is especially egregious when we consider generic objects (for example our list of integers and the sum method; the list type would have to be aware that <code>sum</code> is a valid method for lists of ints and not lists of strings). The solution chosen by some language (like C#) are so called extension methods, static (not dispatched) methods which can be defined as methods on already defined classes.</p>
+<p>We do not have this problem because multi-methods provide this behavior naturally as a consequence of being externally defined (and we even get dispatch!). Our problem is one of syntax, what we want is a way to provide is a way to write something like the above without leaning on the method dispatch syntax.</p>
+<h3>Macros</h3>
+<p>One of the most powerful features of a lisp is it's ability to use macros to create new syntax. Which is exactly the solution to take here. We will use the so called &quot;thread&quot; macro to automatically splice (e.g. thread) the expressions together for us.</p>
+<pre><code>(-&gt;
+  (open &quot;input&quot; :text)
+  (split &quot;\n&quot;)
+  (map fn:(parse Int64 arg:0))
+  (sum)
+  (print)
+)
+</code></pre>
+<p>This is now very similar to the object oriented method chaining style above, except that each function referenced above is actually a free function (well a multi-method anyway) that is simply being passed a different first argument. This means we can chain any method this way, not just single dispatch methods, or extension methods. By carefully designing our multi-methods to put the most dispatch-able argument first we tend to end up allowing most multi-methods to be chained effectively.</p>
+<p>On a SNOP note: The <code>(-&gt;)</code> parenthesis are equivalent to the <code>....;</code> syntax and hence the macro is technically only equivalent when used for 4 or more functions.</p>
+<h3>Aside: Referencing Methods</h3>
+<p>Earlier we referenced a parse function directly - e.g. <code>map(Int64.parse)</code> - rather than going through a lambda - e.g. <code>map(s =&gt; parse(Int64, s))</code>. This is a more concise way to reference functions that already have the correct signature (at least conceptually) in many languages, specifically those that allow accessing methods through type objects of some kind. This conciseness also relies on the same concepts that allow <code>-&gt;</code> to be a viable macro: 'often single dispatch is enough'.</p>
+<p>This part of Cult is still being developed as of this writing. But the following demonstrates two interesting cases:</p>
+<pre><code>(-&gt;
+  (open &quot;input&quot; :text)
+  (split &quot;\n&quot;)
+  ; (1) Lookup the parse method on a type
+  (map Int64.parse)
+  (sum)
+  ; (2) Lookup the print function on a specific object
+  (.print)
+)
+</code></pre>
+<p>Both of these involve the <code>.</code> operator, which is a very flexible piece of syntax in cult, while still being pretty simple. Effectively the <code>.</code> operator allows for &quot;dynamic&quot; lookup of symbols, &quot;dynamic&quot; is in quotes here because this lookup can happen during ahead of time compilation and should hopefully be elided entirely in most cases. The &quot;dynamic&quot; lookup means that a given type or object can provide arbitrary rules for the resolution of the symbol.</p>
+<p>The <code>.</code> in the map (1) is the more concise way to reference a function. In this case we are asking the type to tell us what it thinks the symbol <code>parse</code> means. The default machinery for this query will look up all the possible methods and members and (assuming there is enough information to resolve it) comeback with a partially bound multi-method (specifically with the type object passed as the first argument.</p>
+<p>The <code>.</code> infront of the print (2) is a more interesting example. In this case we are telling Cult to preform a dispatch through the object (e.g. a single dispatch). However by default Cult objects will forward dynamic lookups like this to their implementation of the multi-method named by the symbol, which in turn will performa a full dispatch. Where this is perhaps interesting is in the case of a member variable that is dispatchable (e.g. in this case, perhaps <code>print</code> is a field on the result of the <code>sum</code> function that holds an instance of a function (likely a closure) or a callable type (often called a functor)).</p>
+<h3>Aside: Type Objects</h3>
+<p>Now we are really on a tangent. The symbol <code>Int64</code> references an instance of the type type. This can cause some initial confusion. Specifically the default type type does not forward dynamic lookups to the instance, hence <code>FooType.all-methods</code> does not list all methods on the type <code>FooType</code> but rather the method or member <code>all-methods</code> of the type <code>FooType</code>. Also most &quot;static&quot; methods (those that don't require an instance, but do perform a sort of dispatch on the type) use the instances of the type type to dispatch by value (which could cause strange behavior for multi-methods trying to dispatch onto the type type and type instances, however type instance dispatch by value is the standard practice).</p>
+<p>To work around this all of the default multi-methods that dispatch on the type type (rather than type instances by value) are located in the <code>syndicate.reflection</code> namespace.</p>
+<h2>Conclusion</h2>
+<p>This was a discussion on the first start of advent of code. Which hopefully gave you some perspective on the design choices of the Cult language.</p>
+</div></div></div><div style="margin-bottom:2em;border:1px solid #d8d8d8" class="media"><div class="media-body"><h4 class="media-heading">2018-12-02T20:08:26.783Z</h4><div class="content"><h2>Introduction</h2>
+<p>As a way to exercise my new programming language - Cult - I am doing the advent of code challenges. Part of this will include improving the language - through the standard library, the interpreter, or other features - as I do the challenges. Additionally I will be taking time to explain my reasoning for solving the problems the way I do, and hence the design of the language.</p>
+<p>Eventually this blog will host other cult related content. For now it will just be my thoughts as I work on it.</p>
+</div></div></div></div><div></div></div></div><script>__NEXT_DATA__ = {"props":{"pageProps":{}},"page":"/blog","query":{},"buildId":"fsgObTKcU2rpqk99skQBs","nextExport":true};__NEXT_LOADED_PAGES__=[];__NEXT_REGISTER_PAGE=function(r,f){__NEXT_LOADED_PAGES__.push([r, f])}</script><script async="" id="__NEXT_PAGE__/blog" src="/_next/static/fsgObTKcU2rpqk99skQBs/pages/blog.js"></script><script async="" id="__NEXT_PAGE__/_app" src="/_next/static/fsgObTKcU2rpqk99skQBs/pages/_app.js"></script><script async="" id="__NEXT_PAGE__/_error" src="/_next/static/fsgObTKcU2rpqk99skQBs/pages/_error.js"></script><script src="/_next/static/runtime/webpack-42652fa8b82c329c0559.js" async=""></script><script src="/_next/static/chunks/commons.80cc66e89e6bbcfeda27.js" async=""></script><script src="/_next/static/runtime/main-f33dabec269186cf64d0.js" async=""></script></body></html>

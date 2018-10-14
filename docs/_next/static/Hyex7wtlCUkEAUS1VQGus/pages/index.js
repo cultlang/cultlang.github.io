@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[3],{202:function(n,t,e){__NEXT_REGISTER_PAGE("/",function(){return n.exports=e(203),{page:n.exports.default}})},203:function(n,t,e){"use strict";e.r(t);var o=e(10),u=e.n(o);t.default=function(){return u.a.createElement("div",null,"Intial Deploy To Github")}}},[[202,1,0]]]);
