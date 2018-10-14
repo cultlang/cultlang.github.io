@@ -1,2 +1,2 @@
-# cultlang.github.io-
+# cultlang.github.io
 Cultlang website
