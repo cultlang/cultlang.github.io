@@ -12,7 +12,7 @@ export default () => (
     <Navbar>
         <Nav pills>
             <Link href="/blog">
-            <NavbarBrand href="/blog">Cultlang</NavbarBrand>
+            <NavbarBrand href="/">Cultlang</NavbarBrand>
             </Link>
           <NavItem>
             <Link href="/blog">

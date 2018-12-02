@@ -30,8 +30,7 @@ export default () => {
                         <Media key={i} style={{marginBottom: "2em", border: "1px solid #d8d8d8"}}>
                             <Media body>
                                 <Media heading>
-                                {e.meta.title}
-                                {/* {md.meta.date} */}
+                                {new Date(e.meta.date).toISOString()}
                                 </Media>
                                 <div
                                     className="content"
