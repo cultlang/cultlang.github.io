@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next",
+    "new": "node scripts/newBlog.js",
     "build": "next build",
     "start": "next start",
     "export": "next export"
@@ -15,6 +16,11 @@
     "next": "^7.0.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "reactstrap": "^6.5.0"
+    "reactstrap": "^6.5.0",
+    "remarkable": "^1.7.1",
+    "remarkable-meta": "^1.0.1"
+  },
+  "devDependencies": {
+    "raw-loader": "^0.5.1"
   }
 }
